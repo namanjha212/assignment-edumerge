@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AlumniConnect — College Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #1a1d24;
+    --border: #2a2d36;
+    --accent: #4f8ef7;
+    --accent2: #7c5cfc;
+    --gold: #f5c842;
+    --green: #3ecf8e;
+    --red: #ff6b6b;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --card: #13151c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4 { font-family: 'Syne', sans-serif; }
+
+  /* ── GLOBAL ── */
+  .hidden { display: none !important; }
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: flex; }
+
+  button {
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border: none;
+    outline: none;
+  }
+
+  input, select, textarea {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 12px 16px;
+    width: 100%;
+    font-size: 14px;
+    transition: border-color .2s;
+  }
+
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  select option { background: var(--surface2); }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .3px;
+    transition: opacity .2s, transform .1s;
+  }
+  .btn-primary:hover { opacity: .9; transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: border-color .2s, color .2s;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .4px;
+    text-transform: uppercase;
+  }
+  .badge-gold { background: rgba(245,200,66,.15); color: var(--gold); border: 1px solid rgba(245,200,66,.3); }
+  .badge-green { background: rgba(62,207,142,.15); color: var(--green); border: 1px solid rgba(62,207,142,.3); }
+  .badge-purple { background: rgba(124,92,252,.15); color: #a78bfa; border: 1px solid rgba(124,92,252,.3); }
+  .badge-blue { background: rgba(79,142,247,.15); color: var(--accent); border: 1px solid rgba(79,142,247,.3); }
+  .badge-red { background: rgba(255,107,107,.15); color: var(--red); border: 1px solid rgba(255,107,107,.3); }
+
+  /* ───────────────────────────────────────────
+     LOGIN PAGE
+  ─────────────────────────────────────────── */
+  #loginPage {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #loginPage::before {
+    content: '';
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,142,247,.12) 0%, transparent 70%);
+    top: -150px; left: -150px;
+    pointer-events: none;
+  }
+  #loginPage::after {
+    content: '';
+    position: absolute;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(124,92,252,.1) 0%, transparent 70%);
+    bottom: -100px; right: -100px;
+    pointer-events: none;
+  }
+
+  .login-wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 20px;
+  }
+
+  .login-logo {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .login-logo .logo-icon {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 14px;
+  }
+  .login-logo h1 { font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+  .login-logo p { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .login-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+  }
+
+  .login-card h2 { font-size: 20px; margin-bottom: 6px; }
+  .login-card .sub { color: var(--muted); font-size: 13px; margin-bottom: 28px; }
+
+  .role-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 24px;
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 4px;
+  }
+  .role-tab {
+    padding: 9px 6px;
+    border-radius: 9px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .2px;
+  }
+  .role-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,.3);
+  }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; letter-spacing: .5px; text-transform: uppercase; }
+
+  .login-err { color: var(--red); font-size: 12px; margin-top: 10px; text-align: center; }
+
+  .login-card .btn-primary { width: 100%; margin-top: 8px; padding: 14px; font-size: 15px; }
+
+  .demo-hint {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .demo-hint strong { color: var(--accent); }
+
+  /* ───────────────────────────────────────────
+     SHELL (sidebar + main)
+  ─────────────────────────────────────────── */
+  #appShell {
+    flex-direction: row;
+    min-height: 100vh;
+    width: 100%;
+  }
+
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px 0;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .sidebar-logo {
+    padding: 0 20px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-logo .logo-row { display: flex; align-items: center; gap: 10px; }
+  .sidebar-logo .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .sidebar-logo span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 16px; letter-spacing: -0.5px; }
+
+  .sidebar-user {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+  .sidebar-user .name { font-weight: 600; font-size: 14px; }
+  .sidebar-user .role-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .nav-section { padding: 8px 12px 4px; }
+  .nav-section-label { font-size: 10px; font-weight: 700; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; padding: 0 8px; margin-bottom: 4px; }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all .15s;
+    margin-bottom: 2px;
+    user-select: none;
+  }
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: rgba(79,142,247,.12); color: var(--accent); font-weight: 600; }
+  .nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  .sidebar-bottom {
+    margin-top: auto;
+    padding: 16px 12px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .main {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 32px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .topbar h2 { font-size: 20px; font-weight: 700; }
+  .topbar .top-right { display: flex; gap: 10px; align-items: center; }
+
+  .content { padding: 28px 32px; }
+
+  /* ───────────────────────────────────────────
+     VIEWS (tabs inside main)
+  ─────────────────────────────────────────── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── DASHBOARD ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+  .stat-card .stat-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-card .stat-val { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-card .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  .section-title { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  .person-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    transition: border-color .2s;
+  }
+  .person-card:hover { border-color: var(--accent); }
+  .person-card .pc-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .person-card .avatar {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .person-card .pc-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+  .person-card .pc-sub { font-size: 12px; color: var(--muted); }
+  .person-card .pc-details { font-size: 12px; color: var(--muted); line-height: 1.7; margin-top: 8px; }
+  .person-card .pc-details strong { color: var(--text); }
+
+  /* ── JOB PORTAL ── */
+  .job-feed { max-width: 700px; }
+  .job-post {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+    margin-bottom: 16px;
+    transition: border-color .2s;
+  }
+  .job-post:hover { border-color: var(--border); }
+  .job-post .jp-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .job-post .jp-meta { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .job-post .jp-body { font-size: 14px; line-height: 1.7; color: #c5c8d0; }
+  .job-post .jp-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .jp-tag { background: var(--surface2); color: var(--muted); padding: 4px 10px; border-radius: 6px; font-size: 11px; }
+  .jp-author { font-weight: 700; font-size: 13px; }
+
+  .create-post-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card);
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    width: 100%;
+    color: var(--muted);
+    font-size: 14px;
+    transition: border-color .2s, color .2s;
+  }
+  .create-post-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal h3 { font-size: 18px; margin-bottom: 20px; }
+  .modal .form-group { margin-bottom: 14px; }
+  .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+  /* ── USERS PAGE ── */
+  .users-table { width: 100%; border-collapse: collapse; }
+  .users-table th { text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; padding: 10px 14px; border-bottom: 1px solid var(--border); }
+  .users-table td { padding: 14px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+  .users-table tr:last-child td { border-bottom: none; }
+  .users-table tr:hover td { background: rgba(255,255,255,.02); }
+  .table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+
+  /* ── LEADERBOARD ── */
+  .lb-list { display: flex; flex-direction: column; gap: 10px; max-width: 600px; }
+  .lb-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .lb-rank { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--muted); width: 32px; text-align: center; flex-shrink: 0; }
+  .lb-rank.gold { color: var(--gold); }
+  .lb-rank.silver { color: #aaa; }
+  .lb-rank.bronze { color: #cd7f32; }
+  .lb-info { flex: 1; }
+  .lb-name { font-weight: 700; font-size: 14px; }
+  .lb-sub { font-size: 12px; color: var(--muted); }
+  .lb-score { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 18px; color: var(--accent); }
+
+  /* ── PROFILE ── */
+  .profile-hero {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .profile-info h2 { font-size: 22px; margin-bottom: 4px; }
+  .profile-info .profile-sub { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+  .profile-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 500px; }
+  .pf .pf-label { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .5px; text-transform: uppercase; margin-bottom: 4px; }
+  .pf .pf-val { font-size: 14px; font-weight: 500; }
+
+  /* ── NOTIFICATION TOAST ── */
+  #toast {
+    position: fixed;
+    bottom: 28px; right: 28px;
+    background: var(--green);
+    color: #000;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all .3s;
+    pointer-events: none;
+    z-index: 200;
+  }
+  #toast.show { opacity: 1; transform: translateY(0); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     LOGIN PAGE
+══════════════════════════════════════════════ -->
+<div id="loginPage" class="page active"></div>
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="logo-icon">🎓</div>
+      <h1>AlumniConnect</h1>
+      <p>Your college community hub</p>
+    </div>
+    <div class="login-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your portal</p>
+
+      <div class="role-tabs">
+        <div class="role-tab active" data-role="student" onclick="switchRole('student',this)">Student</div>
+        <div class="role-tab" data-role="alumni" onclick="switchRole('alumni',this)">Alumni</div>
+        <div class="role-tab" data-role="hod" onclick="switchRole('hod',this)">HOD</div>
+      </div>
+
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password">
+      </div>
+      <div id="loginErr" class="login-err"></div>
+      <button class="btn-primary" onclick="doLogin()">Sign in →</button>
+    </div>
+    <div class="demo-hint">
+      Demo: <strong>user</strong> / <strong>pass123</strong> for any role
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     APP SHELL
+══════════════════════════════════════════════ -->
+<div id="appShell" class="page">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-row">
+        <div class="logo-icon">🎓</div>
+        <span>AlumniConnect</span>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="name" id="sbName">—</div>
+      <div class="role-label" id="sbRole">—</div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-label">Main</div>
+      <div class="nav-item active" onclick="goto('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</div>
+      <div class="nav-item" onclick="goto('profile',this)"><span class="nav-icon">👤</span> My Profile</div>
+      <div class="nav-item" onclick="goto('jobs',this)"><span class="nav-icon">💼</span> Job Portal</div>
+    </div>
+
+    <div class="nav-section" id="navCommunity">
+      <div class="nav-section-label">Community</div>
+      <div class="nav-item" onclick="goto('members',this)"><span class="nav-icon">👥</span> Members</div>
+      <div class="nav-item" onclick="goto('leaderboard',this)"><span class="nav-icon">🏆</span> Leaderboard</div>
+    </div>
+
+    <div class="nav-section" id="navAdmin" style="display:none">
+      <div class="nav-section-label">Admin</div>
+      <div class="nav-item" onclick="goto('users',this)"><span class="nav-icon">⚙️</span> Manage Users</div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <h2 id="topbarTitle">Dashboard</h2>
+      <div class="top-right">
+        <span id="topbarBadge"></span>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ── DASHBOARD ── -->
+      <div id="view-dashboard" class="view active">
+        <div class="stats-grid" id="statsGrid"></div>
+        <div class="section-title">Recent Members</div>
+        <div class="card-grid" id="dashCards"></div>
+      </div>
+
+      <!-- ── PROFILE ── -->
+      <div id="view-profile" class="view">
+        <div class="profile-hero">
+          <div class="profile-avatar" id="profileAvatar">—</div>
+          <div class="profile-info">
+            <h2 id="profileName">—</h2>
+            <p class="profile-sub" id="profileSub">—</p>
+            <div style="margin-bottom:14px" id="profileBadges"></div>
+            <div class="profile-fields" id="profileFields"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── JOB PORTAL ── -->
+      <div id="view-jobs" class="view">
+        <div class="job-feed">
+          <button class="create-post-btn" id="createPostBtn" onclick="openPostModal()">
+            <span style="font-size:20px">✏️</span> Share a job, internship or opportunity…
+          </button>
+          <div id="jobFeed"></div>
+        </div>
+      </div>
+
+      <!-- ── MEMBERS ── -->
+      <div id="view-members" class="view">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn-primary" style="padding:9px 18px;font-size:13px" onclick="filterMembers('all')">All</button>
+          <button class="btn-ghost" onclick="filterMembers('student')">Students</button>
+          <button class="btn-ghost" onclick="filterMembers('alumni')">Alumni</button>
+        </div>
+        <div class="card-grid" id="membersGrid"></div>
+      </div>
+
+      <!-- ── LEADERBOARD ── -->
+      <div id="view-leaderboard" class="view">
+        <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+          <button class="btn-primary" style="padding:9px 18px;font-size:13px" onclick="filterLB('engager')">🔥 Top Engagers</button>
+          <button class="btn-ghost" onclick="filterLB('recruiter')">🤝 Top Recruiters</button>
+          <button class="btn-ghost" onclick="filterLB('mentor')">🌟 Top Mentors</button>
+        </div>
+        <div class="lb-list" id="lbList"></div>
+      </div>
+
+      <!-- ── MANAGE USERS (HOD) ── -->
+      <div id="view-users" class="view">
+        <div style="margin-bottom:16px;display:flex;gap:10px;">
+          <button class="btn-primary" onclick="openAddUserModal()">+ Add User</button>
+        </div>
+        <div class="table-wrap">
+          <table class="users-table" id="usersTable">
+            <thead>
+              <tr>
+                <th>Name</th><th>Role</th><th>Details</th><th>Badge</th><th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════ -->
+
+<!-- Post Modal -->
+<div class="modal-overlay" id="postModal">
+  <div class="modal">
+    <h3>📢 Post an Opportunity</h3>
+    <div class="form-group">
+      <label>Type</label>
+      <select id="postType">
+        <option value="Job">Full-time Job</option>
+        <option value="Internship">Internship</option>
+        <option value="Referral">Referral Opening</option>
+        <option value="Event">Event / Webinar</option>
+        <option value="General">General Update</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Title / Headline</label>
+      <input type="text" id="postTitle" placeholder="e.g. SWE Intern at Google — Summer 2026">
+    </div>
+    <div class="form-group">
+      <label>Details</label>
+      <textarea id="postBody" rows="4" placeholder="Share the details, link, requirements…" style="resize:vertical"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Tags (comma separated)</label>
+      <input type="text" id="postTags" placeholder="e.g. Python, Remote, Freshers">
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('postModal')">Cancel</button>
+      <button class="btn-primary" onclick="submitPost()">Publish →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User Modal -->
+<div class="modal-overlay" id="addUserModal">
+  <div class="modal">
+    <h3>➕ Add User</h3>
+    <div class="form-group">
+      <label>Full Name</label>
+      <input type="text" id="auName" placeholder="Full name">
+    </div>
+    <div class="form-group">
+      <label>User Type</label>
+      <select id="auType" onchange="toggleUserFields()">
+        <option value="student">Student</option>
+        <option value="alumni">Alumni</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Roll Number</label>
+      <input type="text" id="auRoll" placeholder="e.g. 21CS045">
+    </div>
+    <div id="studentFields">
+      <div class="form-group">
+        <label>Branch</label>
+        <select id="auBranch">
+          <option>Computer Science</option>
+          <option>Electronics</option>
+          <option>Mechanical</option>
+          <option>Civil</option>
+          <option>Information Technology</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Looking For</label>
+        <select id="auLooking">
+          <option value="Internship">Internship</option>
+          <option value="Job">Full-time Job</option>
+        </select>
+      </div>
+    </div>
+    <div id="alumniFields" style="display:none">
+      <div class="form-group">
+        <label>Company</label>
+        <input type="text" id="auCompany" placeholder="e.g. Google">
+      </div>
+      <div class="form-group">
+        <label>Current Role</label>
+        <input type="text" id="auCurrentRole" placeholder="e.g. Senior Software Engineer">
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Community Role</label>
+      <select id="auCommRole">
+        <option value="">— None —</option>
+        <option value="Top Engager">🔥 Top Engager</option>
+        <option value="Top Recruiter">🤝 Top Recruiter</option>
+        <option value="Top Mentor">🌟 Top Mentor</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-ghost" onclick="closeModal('addUserModal')">Cancel</button>
+      <button class="btn-primary" onclick="submitAddUser()">Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let currentUser = null;
+let activeView = 'dashboard';
+let lbCategory = 'engager';
+
+const CREDENTIALS = { user: 'pass123', admin: 'pass123' };
+
+const USERS = [
+  // Students
+  { id:1, name:'Arjun Sharma', type:'student', roll:'21CS001', branch:'Computer Science', looking:'Internship', commRole:'Top Engager', engagementScore:980, recruiterScore:0, mentorScore:200 },
+  { id:2, name:'Priya Nair', type:'student', roll:'21EC022', branch:'Electronics', looking:'Job', commRole:'', engagementScore:640, recruiterScore:0, mentorScore:0 },
+  { id:3, name:'Rahul Verma', type:'student', roll:'22CS045', branch:'Computer Science', looking:'Internship', commRole:'', engagementScore:820, recruiterScore:0, mentorScore:0 },
+  { id:4, name:'Sneha Iyer', type:'student', roll:'21IT010', branch:'Information Technology', looking:'Job', commRole:'', engagementScore:510, recruiterScore:0, mentorScore:0 },
+  // Alumni
+  { id:5, name:'Vikram Mehta', type:'alumni', roll:'17CS003', company:'Google', currentRole:'Staff Engineer', commRole:'Top Recruiter', engagementScore:760, recruiterScore:1200, mentorScore:450 },
+  { id:6, name:'Anjali Rao', type:'alumni', roll:'18EC011', company:'Microsoft', currentRole:'Product Manager', commRole:'Top Mentor', engagementScore:600, recruiterScore:200, mentorScore:1100 },
+  { id:7, name:'Deepak Joshi', type:'alumni', roll:'16CS042', company:'Amazon', currentRole:'Senior SDE', commRole:'Top Recruiter', engagementScore:430, recruiterScore:950, mentorScore:300 },
+  { id:8, name:'Meera Singh', type:'alumni', roll:'19IT007', company:'Flipkart', currentRole:'Data Scientist', commRole:'', engagementScore:380, recruiterScore:100, mentorScore:620 },
+];
+
+const JOBS = [
+  { id:1, authorName:'Vikram Mehta', authorType:'alumni', type:'Job', title:'Software Engineer L4 — Google Bangalore', body:'We have openings for SWE L4 at Google Bangalore. Looking for strong CS fundamentals, DSA, and system design. Refer through me for a fast-track. 3+ years experience needed.', tags:['Google','Bangalore','SWE','Fulltime'], ts: Date.now()-86400000*2 },
+  { id:2, authorName:'Anjali Rao', authorType:'alumni', type:'Internship', title:'PM Internship at Microsoft (Summer 2026)', body:'Microsoft is hiring PM interns for summer 2026. 10-week paid program. Great for final-year students. Application link in comments — DM me for referral.', tags:['Microsoft','Internship','PM','Freshers'], ts: Date.now()-3600000*18 },
+  { id:3, authorName:'Deepak Joshi', authorType:'alumni', type:'Referral', title:'Senior SDE Openings @ Amazon (Referral)', body:'Multiple senior SDE spots across Amazon teams. If you have 2-5 years backend experience (Java/Python) and want a referral, ping me with your resume. Ill fast-track strong profiles.', tags:['Amazon','Backend','Referral','Java'], ts: Date.now()-3600000*5 },
+];
+
+// Login user roster
+const LOGIN_USERS = {
+  student: { username:'user', password:'pass123', name:'Arjun Sharma', type:'student', roll:'21CS001', branch:'Computer Science', looking:'Internship', commRole:'Top Engager' },
+  alumni:  { username:'user', password:'pass123', name:'Vikram Mehta', type:'alumni', roll:'17CS003', company:'Google', currentRole:'Staff Engineer', commRole:'Top Recruiter' },
+  hod:     { username:'user', password:'pass123', name:'Dr. R. Krishnan', type:'hod', dept:'Computer Science', commRole:'' },
+};
+
+// ═══════════════════════════════════════════
+//  LOGIN
+// ═══════════════════════════════════════════
+let selectedRole = 'student';
+function switchRole(r, el) {
+  selectedRole = r;
+  document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('loginErr').textContent = '';
+}
+
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const cfg = LOGIN_USERS[selectedRole];
+  if (u === cfg.username && p === cfg.password) {
+    currentUser = { ...cfg };
+    showApp();
+  } else {
+    document.getElementById('loginErr').textContent = 'Invalid credentials. Try user / pass123';
+  }
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginPage').classList.add('active');
+  document.getElementById('appShell').classList.remove('active');
+}
+
+// ═══════════════════════════════════════════
+//  APP BOOT
+// ═══════════════════════════════════════════
+function showApp() {
+  document.getElementById('loginPage').classList.remove('active');
+  document.getElementById('appShell').classList.add('active');
+
+  // Sidebar info
+  document.getElementById('sbName').textContent = currentUser.name;
+  document.getElementById('sbRole').textContent = typeLabel(currentUser.type);
+
+  // HOD admin nav
+  document.getElementById('navAdmin').style.display = currentUser.type === 'hod' ? '' : 'none';
+
+  // Topbar badge
+  const tb = document.getElementById('topbarBadge');
+  if (currentUser.commRole) {
+    tb.innerHTML = roleBadgeHtml(currentUser.commRole);
+  } else { tb.innerHTML = ''; }
+
+  renderDashboard();
+  goto('dashboard', document.querySelector('.nav-item'));
+}
+
+function typeLabel(t) {
+  return { student: 'Student', alumni: 'Alumni', hod: 'Head of Department' }[t] || t;
+}
+
+function roleBadgeHtml(r) {
+  const map = {
+    'Top Engager': 'badge-gold',
+    'Top Recruiter': 'badge-green',
+    'Top Mentor': 'badge-purple',
+    'Internship': 'badge-blue',
+    'Job': 'badge-blue',
+  };
+  const icon = { 'Top Engager':'🔥','Top Recruiter':'🤝','Top Mentor':'🌟','Internship':'🔍','Job':'💼' };
+  const cls = map[r] || 'badge-blue';
+  return `<span class="badge ${cls}">${icon[r]||''} ${r}</span>`;
+}
+
+function initials(name) {
+  return name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function timeAgo(ts) {
+  const d = Date.now() - ts;
+  if (d < 3600000) return Math.floor(d/60000) + 'm ago';
+  if (d < 86400000) return Math.floor(d/3600000) + 'h ago';
+  return Math.floor(d/86400000) + 'd ago';
+}
+
+// ═══════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════
+const titles = { dashboard:'Dashboard', profile:'My Profile', jobs:'Job Portal', members:'Members', leaderboard:'Leaderboard', users:'Manage Users' };
+
+function goto(view, el) {
+  activeView = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  document.getElementById('topbarTitle').textContent = titles[view] || view;
+
+  if (view === 'jobs') renderJobs();
+  if (view === 'members') renderMembers('all');
+  if (view === 'leaderboard') renderLeaderboard('engager');
+  if (view === 'users') renderUsersTable();
+  if (view === 'profile') renderProfile();
+}
+
+// ═══════════════════════════════════════════
+//  DASHBOARD
+// ═══════════════════════════════════════════
+function renderDashboard() {
+  const students = USERS.filter(u=>u.type==='student').length;
+  const alumni = USERS.filter(u=>u.type==='alumni').length;
+  const jobs = JOBS.length;
+  const engagers = USERS.filter(u=>u.commRole==='Top Engager').length;
+
+  const stats = [
+    { label:'Total Students', val: students, sub:'Registered', color:'var(--accent)' },
+    { label:'Total Alumni', val: alumni, sub:'Connected', color:'var(--accent2)' },
+    { label:'Job Posts', val: jobs, sub:'Active listings', color:'var(--green)' },
+    { label:'Top Engagers', val: engagers, sub:'This month', color:'var(--gold)' },
+  ];
+
+  document.getElementById('statsGrid').innerHTML = stats.map(s => `
+    <div class="stat-card">
+      <div class="stat-label">${s.label}</div>
+      <div class="stat-val" style="color:${s.color}">${s.val}</div>
+      <div class="stat-sub">${s.sub}</div>
+    </div>
+  `).join('');
+
+  const recent = USERS.slice(-4);
+  document.getElementById('dashCards').innerHTML = recent.map(personCardHtml).join('');
+}
+
+function personCardHtml(u) {
+  let details = '';
+  if (u.type === 'student') {
+    details = `<div class="pc-details"><strong>Roll:</strong> ${u.roll} &nbsp;·&nbsp; <strong>Branch:</strong> ${u.branch}<br><strong>Seeking:</strong> ${u.looking}</div>`;
+  } else if (u.type === 'alumni') {
+    details = `<div class="pc-details"><strong>Roll:</strong> ${u.roll}<br><strong>${u.currentRole}</strong> @ ${u.company}</div>`;
+  }
+  const badge = u.commRole ? `<div style="margin-top:10px">${roleBadgeHtml(u.commRole)}</div>` : '';
+  return `
+    <div class="person-card">
+      <div class="pc-head">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="avatar">${initials(u.name)}</div>
+          <div>
+            <div class="pc-name">${u.name}</div>
+            <div class="pc-sub">${typeLabel(u.type)}</div>
+          </div>
+        </div>
+      </div>
+      ${details}
+      ${badge}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════
+function renderProfile() {
+  const u = currentUser;
+  document.getElementById('profileAvatar').textContent = initials(u.name);
+  document.getElementById('profileName').textContent = u.name;
+  document.getElementById('profileSub').textContent = typeLabel(u.type);
+
+  const badges = u.commRole ? roleBadgeHtml(u.commRole) : '<span style="color:var(--muted);font-size:12px">No role badge yet</span>';
+  document.getElementById('profileBadges').innerHTML = badges;
+
+  let fields = '';
+  if (u.type === 'student') {
+    fields = `
+      <div class="pf"><div class="pf-label">Roll Number</div><div class="pf-val">${u.roll}</div></div>
+      <div class="pf"><div class="pf-label">Branch</div><div class="pf-val">${u.branch}</div></div>
+      <div class="pf"><div class="pf-label">Looking For</div><div class="pf-val">${roleBadgeHtml(u.looking)}</div></div>
+    `;
+  } else if (u.type === 'alumni') {
+    fields = `
+      <div class="pf"><div class="pf-label">Roll Number</div><div class="pf-val">${u.roll}</div></div>
+      <div class="pf"><div class="pf-label">Company</div><div class="pf-val">${u.company}</div></div>
+      <div class="pf"><div class="pf-label">Current Role</div><div class="pf-val">${u.currentRole}</div></div>
+    `;
+  } else {
+    fields = `<div class="pf"><div class="pf-label">Department</div><div class="pf-val">${u.dept}</div></div>`;
+  }
+  document.getElementById('profileFields').innerHTML = fields;
+}
+
+// ═══════════════════════════════════════════
+//  JOB PORTAL
+// ═══════════════════════════════════════════
+function renderJobs() {
+  // Only alumni & HOD can post
+  const canPost = currentUser.type === 'alumni' || currentUser.type === 'hod';
+  document.getElementById('createPostBtn').style.display = canPost ? 'flex' : 'none';
+
+  document.getElementById('jobFeed').innerHTML = [...JOBS].reverse().map(j => {
+    const typeColor = { Job:'badge-blue', Internship:'badge-green', Referral:'badge-purple', Event:'badge-gold', General:'badge-red' }[j.type] || 'badge-blue';
+    const tags = j.tags.map(t=>`<span class="jp-tag">${t}</span>`).join('');
+    return `
+    <div class="job-post">
+      <div class="jp-head">
+        <div>
+          <div class="jp-author">${j.authorName} <span style="color:var(--muted);font-weight:400;font-size:12px">· ${typeLabel(j.authorType)}</span></div>
+          <div class="jp-meta">${timeAgo(j.ts)}</div>
+        </div>
+        <span class="badge ${typeColor}">${j.type}</span>
+      </div>
+      <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;margin-bottom:8px">${j.title}</div>
+      <div class="jp-body">${j.body}</div>
+      <div class="jp-tags">${tags}</div>
+    </div>`;
+  }).join('');
+}
+
+function openPostModal() {
+  document.getElementById('postModal').classList.add('open');
+}
+
+function submitPost() {
+  const title = document.getElementById('postTitle').value.trim();
+  const body = document.getElementById('postBody').value.trim();
+  if (!title || !body) { showToast('Please fill title and details'); return; }
+  const tags = document.getElementById('postTags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  JOBS.push({
+    id: JOBS.length+1,
+    authorName: currentUser.name,
+    authorType: currentUser.type,
+    type: document.getElementById('postType').value,
+    title, body, tags,
+    ts: Date.now()
+  });
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postBody').value = '';
+  document.getElementById('postTags').value = '';
+  closeModal('postModal');
+  renderJobs();
+  showToast('Post published successfully!');
+}
+
+// ═══════════════════════════════════════════
+//  MEMBERS
+// ═══════════════════════════════════════════
+function renderMembers(filter) {
+  const list = filter === 'all' ? USERS : USERS.filter(u=>u.type===filter);
+  document.getElementById('membersGrid').innerHTML = list.map(personCardHtml).join('');
+}
+function filterMembers(f) { renderMembers(f); }
+
+// ═══════════════════════════════════════════
+//  LEADERBOARD
+// ═══════════════════════════════════════════
+function renderLeaderboard(cat) {
+  lbCategory = cat;
+  const scoreKey = { engager:'engagementScore', recruiter:'recruiterScore', mentor:'mentorScore' }[cat];
+  const catLabel = { engager:'🔥 Top Engagers', recruiter:'🤝 Top Recruiters', mentor:'🌟 Top Mentors' }[cat];
+  const sorted = [...USERS].sort((a,b)=>b[scoreKey]-a[scoreKey]).slice(0,6);
+  const rankCls = ['gold','silver','bronze'];
+  document.getElementById('lbList').innerHTML = sorted.map((u,i) => `
+    <div class="lb-item">
+      <div class="lb-rank ${rankCls[i]||''}">${i+1}</div>
+      <div class="avatar" style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:#fff;flex-shrink:0">${initials(u.name)}</div>
+      <div class="lb-info">
+        <div class="lb-name">${u.name}</div>
+        <div class="lb-sub">${typeLabel(u.type)} ${u.commRole ? '· '+u.commRole : ''}</div>
+      </div>
+      <div class="lb-score">${u[scoreKey]}</div>
+    </div>
+  `).join('');
+}
+function filterLB(cat) { renderLeaderboard(cat); }
+
+// ═══════════════════════════════════════════
+//  MANAGE USERS (HOD)
+// ═══════════════════════════════════════════
+function renderUsersTable() {
+  document.getElementById('usersTableBody').innerHTML = USERS.map(u => {
+    let details = u.type === 'student'
+      ? `${u.branch} · Roll ${u.roll}`
+      : `${u.currentRole} @ ${u.company} · Roll ${u.roll}`;
+    const badge = u.commRole ? roleBadgeHtml(u.commRole) : '<span style="color:var(--muted);font-size:12px">—</span>';
+    return `
+      <tr>
+        <td><strong>${u.name}</strong></td>
+        <td>${typeLabel(u.type)}</td>
+        <td style="color:var(--muted);font-size:12px">${details}</td>
+        <td>${badge}</td>
+        <td><button class="btn-ghost" style="padding:6px 12px;font-size:12px" onclick="removeUser(${u.id})">Remove</button></td>
+      </tr>`;
+  }).join('');
+}
+
+function removeUser(id) {
+  const idx = USERS.findIndex(u=>u.id===id);
+  if (idx > -1) { USERS.splice(idx,1); renderUsersTable(); renderDashboard(); showToast('User removed'); }
+}
+
+function openAddUserModal() {
+  document.getElementById('addUserModal').classList.add('open');
+}
+
+function toggleUserFields() {
+  const t = document.getElementById('auType').value;
+  document.getElementById('studentFields').style.display = t === 'student' ? '' : 'none';
+  document.getElementById('alumniFields').style.display = t === 'alumni' ? '' : 'none';
+}
+
+function submitAddUser() {
+  const name = document.getElementById('auName').value.trim();
+  const type = document.getElementById('auType').value;
+  const roll = document.getElementById('auRoll').value.trim();
+  const commRole = document.getElementById('auCommRole').value;
+  if (!name || !roll) { showToast('Name and Roll are required'); return; }
+  const u = { id: USERS.length+100, name, type, roll, commRole, engagementScore:0, recruiterScore:0, mentorScore:0 };
+  if (type === 'student') {
+    u.branch = document.getElementById('auBranch').value;
+    u.looking = document.getElementById('auLooking').value;
+  } else {
+    u.company = document.getElementById('auCompany').value || '—';
+    u.currentRole = document.getElementById('auCurrentRole').value || '—';
+  }
+  USERS.push(u);
+  ['auName','auRoll','auCompany','auCurrentRole'].forEach(id=>{ document.getElementById(id).value=''; });
+  closeModal('addUserModal');
+  renderUsersTable();
+  renderDashboard();
+  showToast(`${name} added successfully!`);
+}
+
+// ═══════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = '✓ '+msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// Close modals on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o=>{
+  o.addEventListener('click', e=>{ if(e.target===o) o.classList.remove('open'); });
+});
+
+// Enter key on login
+document.addEventListener('keydown', e=>{
+  if (e.key==='Enter' && document.getElementById('loginPage').classList.contains('active')) doLogin();
+});
+</script>
+</body>
+</html>
